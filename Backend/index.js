@@ -6,7 +6,7 @@ import db from "./db.js";
 import dotenv from "dotenv";
 import { Login, SignUp } from "./conrollers/authController.js";
 import { CreateProject, GetAllProjects, GetProjectById } from "./conrollers/projectController.js";
-import SendNotification from "./conrollers/notificationController.js";
+import createSendNotification from "./conrollers/notificationController.js";
 import axios from "axios";
 
 dotenv.config();
@@ -16,14 +16,21 @@ const server = http.createServer(app);
 
 
 const activeConnections = [];
+const onlineUsers = {}; // userId -> socket.id
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5500",
+  "http://localhost:5500",
+  "null",
+];
 
 app.use(express.json());
 app.use(
   cors({
     origin: allowedOrigins,
-    credentials: true,
+    credentials: false,
   }),
 );
 
@@ -34,22 +41,22 @@ app.get("/api/projects/all", GetAllProjects);
 app.post("/api/projects", CreateProject);
 app.get("/api/projects/:projectId", GetProjectById);
 
-/**
- * NOTIFICATION RELAY ENDPOINT
- * POST /api/event/notification
- */
-app.post("/api/event/notification", SendNotification);
-
-
-
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
-    credentials: true,
+    methods: ["GET", "POST"],
+    transports: ["polling", "websocket"],
+    credentials: false
   },
 });
 
 app.io = io;
+app.onlineUsers = onlineUsers;
+
+/**
+ * NOTIFICATION RELAY ENDPOINT
+ * POST /api/event/notification
+ */
+app.post("/api/event/notification", createSendNotification(io, onlineUsers));
 
 io.use(async (socket, next) => {
   const { apikey, token } = socket.handshake.auth;
