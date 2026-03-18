@@ -35,7 +35,7 @@ export default function DashBoard() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:4000/api/projects/all");
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/projects/all`);
       const data = await response.json();
       if (response.ok) {
         setProjects(data);
@@ -66,7 +66,7 @@ export default function DashBoard() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:4000/api/projects", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/projects`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProject),

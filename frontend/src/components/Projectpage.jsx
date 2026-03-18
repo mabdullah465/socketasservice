@@ -25,7 +25,7 @@ export default function Projectpage() {
       console.log(projectId);
 
       const res = await fetch(
-        `http://localhost:4000/api/projects/${projectId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/projects/${projectId}`,
       );
       const data = await res.json();
       console.log(data);
@@ -113,7 +113,7 @@ export default function Projectpage() {
         {/* Configuration Details */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Endpoints</CardTitle>
+            <CardTitle className="text-lg">Project Endpoints</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -131,18 +131,23 @@ export default function Projectpage() {
           </CardContent>
         </Card>
 
-        <Card>
+               <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Project Status</CardTitle>
+            <CardTitle className="text-lg">Socket Endpoints</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              <span className="text-sm font-medium">Healthy & Active</span>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Socket URL
+              </p>
+              <p className="font-mono text-sm">{import.meta.env.VITE_BACKEND_URL}</p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Last accessed 2 minutes ago
-            </p>
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase">
+                Notificaion EndPoint
+              </p>
+              <p className="font-mono text-sm">/api/event/notification</p>
+            </div>
           </CardContent>
         </Card>
       </div>
