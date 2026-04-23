@@ -1,11 +1,16 @@
 import { useState } from "react";
 import "./App.css";
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import DashBoard from "./components/DashBoard";
 import Login from "./components/Login";
 import SignUp from "./components/SignUp";
 import Projectpage from "./components/Projectpage";
 import MainLayout from "./components/Layout";
+import DocumentationPage from "./components/DocumentationPage";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -13,7 +18,7 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <MainLayout />, 
+      element: <MainLayout />,
       children: [
         {
           index: true,
@@ -27,6 +32,10 @@ function App() {
           path: "project/:projectId",
           element: <Projectpage />,
         },
+        {
+          path: "docs",
+          element: <DocumentationPage />,
+        },
       ],
     },
     {
@@ -36,7 +45,7 @@ function App() {
     {
       path: "/signup",
       element: <SignUp />,
-    }
+    },
   ]);
 
   return <RouterProvider router={router} />;
