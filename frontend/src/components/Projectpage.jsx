@@ -13,12 +13,29 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 export default function Projectpage() {
+  const [analytics, setAnalytics] = useState(null);
+
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [showKey, setShowKey] = useState(false);
 
   const [projectData, setProjectData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchAnalytics = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/projects/${projectId}/analytics`,
+    );
+    const data = await res.json();
+    setAnalytics(data);
+  };
+
+  useEffect(() => {
+    fetchProject();
+    fetchAnalytics();
+    const interval = setInterval(fetchAnalytics, 30000); // Refresh every 30s
+    return () => clearInterval(interval);
+  }, [projectId]);
 
   const fetchProject = async () => {
     try {
@@ -131,7 +148,7 @@ export default function Projectpage() {
           </CardContent>
         </Card>
 
-               <Card>
+        <Card>
           <CardHeader>
             <CardTitle className="text-lg">Socket Endpoints</CardTitle>
           </CardHeader>
@@ -140,13 +157,57 @@ export default function Projectpage() {
               <p className="text-xs font-semibold text-muted-foreground uppercase">
                 Socket URL
               </p>
-              <p className="font-mono text-sm">{import.meta.env.VITE_BACKEND_URL}</p>
+              <p className="font-mono text-sm">
+                {import.meta.env.VITE_BACKEND_URL}
+              </p>
             </div>
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase">
                 Notificaion EndPoint
               </p>
               <p className="font-mono text-sm">/api/event/notification</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid gap-4 md:grid-cols-3 mt-6">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {analytics?.activeConnections || 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Streamed
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {analytics?.totalNotifications || 0}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Delivery Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {analytics?.totalNotifications > 0
+                ? Math.round(
+                    (analytics.deliveryStats.find((s) => s.status === "sent")
+                      ?.count /
+                      analytics.totalNotifications) *
+                      100,
+                  )
+                : 0}
+              %
             </div>
           </CardContent>
         </Card>
