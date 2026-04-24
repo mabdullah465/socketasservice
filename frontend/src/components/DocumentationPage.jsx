@@ -1,4 +1,5 @@
 import React from "react";
+import ChatWidget from "./ChatWidget";
 
 function Section({ title, children }) {
   return (
@@ -151,6 +152,10 @@ export default NotificationListener;`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <div className="cursor-pointer">
+        {" "}
+        <ChatWidget />
+      </div>
       <div className="mx-auto max-w-5xl px-4 py-8 md:px-6 lg:px-8">
         <div className="rounded-3xl border bg-card p-6 md:p-8">
           <p className="text-sm font-medium text-muted-foreground">
@@ -184,9 +189,7 @@ export default NotificationListener;`;
 
         <div className="mt-10 space-y-10">
           <Section title="1. Required Environment Variables">
-            <p>
-              Add the socket service URL to your backend environment file.
-            </p>
+            <p>Add the socket service URL to your backend environment file.</p>
             <CodeBlock code={backendEnv} />
 
             <p>
@@ -201,8 +204,8 @@ export default NotificationListener;`;
                 and the logged-in user token.
               </p>
               <p>
-                <strong>Why?</strong> The socket connection is authenticated using{" "}
-                <code>apikey</code> and <code>token</code>.
+                <strong>Why?</strong> The socket connection is authenticated
+                using <code>apikey</code> and <code>token</code>.
               </p>
             </div>
           </Section>
@@ -225,16 +228,23 @@ export default NotificationListener;`;
             <CodeBlock code={backendAxiosRequest} />
 
             <div className="rounded-2xl border bg-muted/30 p-4 text-sm leading-6">
-              <p><strong>user_id</strong> — ID of the user who should receive the notification</p>
-              <p><strong>type</strong> — Notification type such as info, success, warning, or error</p>
-              <p><strong>data</strong> — Custom payload that will be delivered to the frontend</p>
+              <p>
+                <strong>user_id</strong> — ID of the user who should receive the
+                notification
+              </p>
+              <p>
+                <strong>type</strong> — Notification type such as info, success,
+                warning, or error
+              </p>
+              <p>
+                <strong>data</strong> — Custom payload that will be delivered to
+                the frontend
+              </p>
             </div>
           </Section>
 
           <Section title="3. Receive Realtime Notification on Frontend">
-            <p>
-              Install Socket.IO client in your frontend application:
-            </p>
+            <p>Install Socket.IO client in your frontend application:</p>
 
             <CodeBlock code={`npm install socket.io-client`} />
 
@@ -257,9 +267,15 @@ export default NotificationListener;`;
               <p>
                 <strong>To receive notifications on frontend:</strong>
               </p>
-              <p>- <code>VITE_SOCKET_URL</code> is required</p>
-              <p>- <code>VITE_SOCKET_API_KEY</code> is required</p>
-              <p>- user auth <code>token</code> is required</p>
+              <p>
+                - <code>VITE_SOCKET_URL</code> is required
+              </p>
+              <p>
+                - <code>VITE_SOCKET_API_KEY</code> is required
+              </p>
+              <p>
+                - user auth <code>token</code> is required
+              </p>
             </div>
 
             <div className="rounded-2xl border bg-amber-500/10 p-4 text-sm leading-6">
