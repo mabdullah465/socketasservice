@@ -42,7 +42,7 @@ ${DOCS_CONTEXT}
         },
         {
           headers: {
-            Authorization: `Bearer ${"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"}`,
+            Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
             "Content-Type": "application/json",
           },
         },
