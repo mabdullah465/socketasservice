@@ -17,3 +17,17 @@ CREATE TABLE projects (
     api_key VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE notification_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    project_id VARCHAR(36) NOT NULL, -- Matched to projects.id
+    user_id INT NOT NULL,
+    type VARCHAR(50),
+    status ENUM('sent', 'failed_offline') DEFAULT 'sent',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_project_log 
+        FOREIGN KEY (project_id) 
+        REFERENCES projects(id) 
+        ON DELETE CASCADE -- Recommended: deletes logs if project is deleted
+) ENGINE=InnoDB;

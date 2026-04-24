@@ -5,7 +5,12 @@ import cors from "cors";
 import db from "./db.js";
 import dotenv from "dotenv";
 import { Login, SignUp } from "./conrollers/authController.js";
-import { CreateProject, GetAllProjects, GetProjectById } from "./conrollers/projectController.js";
+import {
+  CreateProject,
+  GetAllProjects,
+  GetProjectById,
+  GetProjectAnalytics,
+} from "./conrollers/projectController.js";
 import createSendNotification from "./conrollers/notificationController.js";
 import axios from "axios";
 
@@ -13,7 +18,6 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-
 
 const activeConnections = [];
 const onlineUsers = {}; // userId -> socket.id
@@ -45,7 +49,7 @@ const io = new Server(server, {
   cors: {
     methods: ["GET", "POST"],
     transports: ["polling", "websocket"],
-    credentials: false
+    credentials: false,
   },
 });
 
@@ -57,6 +61,7 @@ app.onlineUsers = onlineUsers;
  * POST /api/event/notification
  */
 app.post("/api/event/notification", createSendNotification(io, onlineUsers));
+app.get("/api/projects/:projectId/analytics", GetProjectAnalytics);
 
 io.use(async (socket, next) => {
   const { apikey, token } = socket.handshake.auth;
@@ -67,7 +72,10 @@ io.use(async (socket, next) => {
 
   try {
     // 1. Verify Project API Key in our local DB
-    const [projects] = await db.query("SELECT * FROM projects WHERE api_key = ?", [apikey]);
+    const [projects] = await db.query(
+      "SELECT * FROM projects WHERE api_key = ?",
+      [apikey],
+    );
     if (projects.length === 0) {
       return next(new Error("Invalid API Key"));
     }
@@ -76,17 +84,17 @@ io.use(async (socket, next) => {
     // 2. Verify Token via the Project's specific Auth Endpoint
     const authUrl = `${project.base_url}${project.authendpoint}`;
     const response = await axios.get(authUrl, {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" }
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
     });
 
     // 3. Attach User & Project data to socket (Assuming response.data contains user info)
     if (response.status === 200) {
       // Adjust this based on your project's auth response structure
-      const userData = response.data.user || response.data; 
+      const userData = response.data.user || response.data;
       socket.user = {
         id: userData.id,
         email: userData.email,
-        projectId: project.id
+        projectId: project.id,
       };
       next();
     } else {
@@ -99,10 +107,10 @@ io.use(async (socket, next) => {
 
 io.on("connection", (socket) => {
   const userId = Number(socket.user.id);
-  
+
   // Store user in onlineUsers map
   onlineUsers[userId] = socket.id;
-  
+
   // Also join a room for the project ID to allow broad-project notifications
   socket.join(socket.user.projectId);
 
